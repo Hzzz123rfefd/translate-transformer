@@ -296,7 +296,7 @@ class ModelForTranslate(nn.Module):
         self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name_or_path,local_files_only=True)
         self.vocab_size = self.tokenizer.vocab_size
         self.vecab_dim = vecab_dim
-        self.cross = nn.CrossEntropyLoss(reduction='none')
+        self.device = device if torch.cuda.is_available() else "cpu"
         self.embedding = nn.Embedding(self.vocab_size, self.vecab_dim, dtype=torch.float32,device = self.device)
 
         self.backone = ModelTransformer(
