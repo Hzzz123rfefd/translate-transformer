@@ -28,9 +28,9 @@ traininng:
 dataset_type:
   translate
 dataset:
-  train_data_path: "data/train.jsonl"       
-  test_data_path: "data/test.jsonl"       
-  valid_data_path: "data/test.jsonl"       
+  train_data_path: "wmt17_train/train.jsonl"       
+  test_data_path: "wmt17_train/test.jsonl"       
+  valid_data_path: "wmt17_train/vaild.jsonl"       
   max_padding_length: 512
 
 

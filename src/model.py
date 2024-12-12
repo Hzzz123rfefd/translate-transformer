@@ -16,8 +16,8 @@ class ModelBart(nn.Module):
             self,
             model_name_or_path: str = 'facebook/mbart-large-50-many-to-many-mmt',
             local_files_only = True,
-            src_lang = "zh_CN",
-            tgt_lang = "en_XX",
+            src_lang = "en_XX",
+            tgt_lang = "zh_CN",
             device: str = "cpu",
         ):
         super().__init__()
@@ -50,6 +50,8 @@ class ModelPretrainForTranslateBaseBart(nn.Module):
     def __init__(
         self, 
         pretrain_model_name_or_path = "facebook/mbart-large-50-many-to-many-mmt",
+        src_lang = "en_XX",
+        tgt_lang = "zh_CN",
         device = "cpu"
     ):
         super().__init__()
@@ -58,6 +60,8 @@ class ModelPretrainForTranslateBaseBart(nn.Module):
 
         self.model = ModelBart(
             model_name_or_path = self.model_name_or_path,
+            src_lang = src_lang, 
+            tgt_lang = tgt_lang,
             device = self.device
         )
         self.tokenizer = self.model.tokenizer
@@ -82,13 +86,11 @@ class ModelPretrainForTranslateBaseBart(nn.Module):
         predict = predict.reshape(B*T, C)
         labels = labels.reshape(-1)
         mask = mask.reshape(-1)
-
         output = {
             "predict":predict,
             "label":labels,
             "mask":mask
         }
-
         return output
 
     def load_pretrained(self, save_model_dir):
@@ -122,7 +124,6 @@ class ModelPretrainForTranslateBaseBart(nn.Module):
             optimizer.zero_grad()
 
             """ forward """
-            used_memory = torch.cuda.memory_allocated(torch.cuda.current_device()) / (1024 ** 3)  
             output = self.forward(inputs)
 
             """ calculate loss """
@@ -137,11 +138,9 @@ class ModelPretrainForTranslateBaseBart(nn.Module):
 
             """ modify parameters """
             optimizer.step()
-            after_used_memory = torch.cuda.memory_allocated(torch.cuda.current_device()) / (1024 ** 3) 
-            postfix_str = "total_loss: {:.4f},average_hit_rate:{:.4f},use_memory: {:.1f}G".format(
+            postfix_str = "total_loss: {:.4f},average_hit_rate:{:.4f}".format(
                 total_loss.avg, 
                 average_hit_rate.avg,
-                after_used_memory - used_memory
             )
             pbar.set_postfix_str(postfix_str)
             pbar.update()
@@ -378,7 +377,6 @@ class ModelForTranslate(nn.Module):
             optimizer.zero_grad()
 
             """ forward """
-            used_memory = torch.cuda.memory_allocated(torch.cuda.current_device()) / (1024 ** 3)  
             output = self.forward(inputs)
 
             """ calculate loss """
@@ -393,11 +391,9 @@ class ModelForTranslate(nn.Module):
 
             """ modify parameters """
             optimizer.step()
-            after_used_memory = torch.cuda.memory_allocated(torch.cuda.current_device()) / (1024 ** 3) 
-            postfix_str = "total_loss: {:.4f},average_hit_rate:{:.4f},use_memory: {:.1f}G".format(
+            postfix_str = "total_loss: {:.4f},average_hit_rate:{:.4f}".format(
                 total_loss.avg, 
                 average_hit_rate.avg,
-                after_used_memory - used_memory
             )
             pbar.set_postfix_str(postfix_str)
             pbar.update()
